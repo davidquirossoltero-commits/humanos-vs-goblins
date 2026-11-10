@@ -1,0 +1,101 @@
+[
+  {
+    "id": "arquero",
+    "name": "Arquero",
+    "description": "Dispara flechas rápidas a un solo objetivo.",
+    "cost": 100,
+    "kind": "arrow",
+    "stats": {
+      "range": 175,
+      "damage": 1,
+      "cooldown": 0.7,
+      "projectile_speed": 680,
+      "splash": 0,
+      "pierce": 1,
+      "slow_duration": 0,
+      "slow_factor": 1
+    },
+    "upgrades": [
+      {
+        "id": "rapido",
+        "name": "Disparo rápido",
+        "description": "Reduce el tiempo entre flechas.",
+        "cost": 80,
+        "patch": {"cooldown": 0.34}
+      },
+      {
+        "id": "perfora",
+        "name": "Flechas perforantes",
+        "description": "Cada flecha atraviesa hasta 3 enemigos.",
+        "cost": 110,
+        "patch": {"pierce": 3}
+      }
+    ]
+  },
+  {
+    "id": "mago",
+    "name": "Mago",
+    "description": "Lanza un orbe que estalla y daña en área.",
+    "cost": 200,
+    "kind": "orb",
+    "stats": {
+      "range": 160,
+      "damage": 1,
+      "cooldown": 1.15,
+      "projectile_speed": 460,
+      "splash": 54,
+      "pierce": 1,
+      "slow_duration": 0,
+      "slow_factor": 1
+    },
+    "upgrades": [
+      {
+        "id": "estallido",
+        "name": "Estallido mayor",
+        "description": "El orbe estalla en un área mucho más amplia.",
+        "cost": 140,
+        "patch": {"splash": 100}
+      },
+      {
+        "id": "escarcha",
+        "name": "Escarcha",
+        "description": "El impacto ralentiza a los goblins.",
+        "cost": 130,
+        "patch": {"slow_duration": 2.4, "slow_factor": 0.5}
+      }
+    ]
+  },
+  {
+    "id": "canon",
+    "name": "Cañón",
+    "description": "Bola de hierro con daño de área.",
+    "cost": 240,
+    "kind": "shell",
+    "stats": {
+      "range": 150,
+      "damage": 2,
+      "cooldown": 1.45,
+      "projectile_speed": 380,
+      "splash": 62,
+      "pierce": 1,
+      "slow_duration": 0,
+      "slow_factor": 1
+    },
+    "upgrades": [
+      {
+        "id": "metralla",
+        "name": "Metralla",
+        "description": "La explosión cubre mucha más distancia.",
+        "cost": 150,
+        "patch": {"splash": 110}
+      },
+      {
+        "id": "alcance",
+        "name": "Largo alcance",
+        "description": "El cañón dispara mucho más lejos.",
+        "cost": 130,
+        "patch": {"range": 220}
+      }
+    ]
+  }
+]

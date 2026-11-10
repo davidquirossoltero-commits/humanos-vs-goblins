@@ -1,0 +1,13 @@
+extends Node2D
+
+
+func _ready() -> void:
+	z_index = 0
+	queue_redraw()
+
+
+func _draw() -> void:
+	var world := get_parent() as GameWorld
+	if world == null or world.catalog == null:
+		return
+	DrawMap.render(self, world.catalog.map)

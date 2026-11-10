@@ -1,0 +1,39 @@
+[
+  {"groups": [{"enemy_id": "goblin", "count": 12, "interval": 0.5}]},
+  {"groups": [{"enemy_id": "goblin", "count": 18, "interval": 0.42}]},
+  {"groups": [
+    {"enemy_id": "goblin", "count": 10, "interval": 0.4},
+    {"enemy_id": "jinete", "count": 6, "interval": 0.55}
+  ]},
+  {"groups": [{"enemy_id": "hobgoblin", "count": 10, "interval": 0.75}]},
+  {"groups": [
+    {"enemy_id": "goblin", "count": 8, "interval": 0.35},
+    {"enemy_id": "jinete", "count": 8, "interval": 0.45},
+    {"enemy_id": "hobgoblin", "count": 4, "interval": 0.7}
+  ]},
+  {"groups": [
+    {"enemy_id": "ogro", "count": 5, "interval": 1.15},
+    {"enemy_id": "goblin", "count": 6, "interval": 0.35}
+  ]},
+  {"groups": [
+    {"enemy_id": "hobgoblin", "count": 6, "interval": 0.6},
+    {"enemy_id": "jinete", "count": 10, "interval": 0.38},
+    {"enemy_id": "ogro", "count": 3, "interval": 1.1}
+  ]},
+  {"groups": [
+    {"enemy_id": "trol", "count": 4, "interval": 1.5},
+    {"enemy_id": "hobgoblin", "count": 8, "interval": 0.6},
+    {"enemy_id": "jinete", "count": 6, "interval": 0.4}
+  ]},
+  {"groups": [
+    {"enemy_id": "ogro", "count": 5, "interval": 1.0},
+    {"enemy_id": "trol", "count": 3, "interval": 1.6},
+    {"enemy_id": "jinete", "count": 8, "interval": 0.36}
+  ]},
+  {"groups": [
+    {"enemy_id": "trol", "count": 4, "interval": 1.4},
+    {"enemy_id": "ogro", "count": 5, "interval": 0.95},
+    {"enemy_id": "hobgoblin", "count": 8, "interval": 0.5},
+    {"enemy_id": "jinete", "count": 10, "interval": 0.32}
+  ]}
+]

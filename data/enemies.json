@@ -1,0 +1,84 @@
+[
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "plural": "goblins",
+    "blurb": "Pequeño y numeroso.",
+    "layers": [
+      {"hp": 1, "speed": 82, "reward": 1, "leak": 1, "radius": 14, "look": "goblin"}
+    ]
+  },
+  {
+    "id": "jinete",
+    "name": "Jinete goblin",
+    "plural": "jinetes goblin",
+    "blurb": "Monta un jabalí. Al caer, el goblin sigue a pie.",
+    "layers": [
+      {
+        "hp": 3,
+        "speed": 158,
+        "reward": 2,
+        "leak": 1,
+        "radius": 18,
+        "look": "jinete",
+        "spawns": [{"id": "goblin", "count": 1}]
+      }
+    ]
+  },
+  {
+    "id": "hobgoblin",
+    "name": "Hobgoblin",
+    "plural": "hobgoblins",
+    "blurb": "Piel gruesa. Al romperse suelta dos goblins.",
+    "layers": [
+      {
+        "hp": 6,
+        "speed": 62,
+        "reward": 2,
+        "leak": 1,
+        "radius": 16,
+        "look": "hobgoblin",
+        "spawns": [{"id": "goblin", "count": 2}]
+      }
+    ]
+  },
+  {
+    "id": "ogro",
+    "name": "Ogro acorazado",
+    "plural": "ogros acorazados",
+    "blurb": "La armadura se rompe y luego suelta hobgoblins.",
+    "layers": [
+      {"hp": 10, "speed": 36, "reward": 2, "leak": 1, "radius": 24, "look": "ogro_armadura"},
+      {
+        "hp": 8,
+        "speed": 42,
+        "reward": 3,
+        "leak": 1,
+        "radius": 22,
+        "look": "ogro",
+        "spawns": [{"id": "hobgoblin", "count": 2}]
+      }
+    ]
+  },
+  {
+    "id": "trol",
+    "name": "Trol",
+    "plural": "troles",
+    "blurb": "Muy duro. En furia suelta un hobgoblin y dos goblins.",
+    "layers": [
+      {"hp": 18, "speed": 28, "reward": 3, "leak": 2, "radius": 26, "look": "trol"},
+      {
+        "hp": 14,
+        "speed": 40,
+        "reward": 4,
+        "leak": 2,
+        "radius": 26,
+        "look": "trol_furia",
+        "spawns": [
+          {"id": "hobgoblin", "count": 1},
+          {"id": "goblin", "count": 2}
+        ]
+      }
+    ]
+  }
+]

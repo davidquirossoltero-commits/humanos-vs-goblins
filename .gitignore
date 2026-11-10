@@ -1,0 +1,13 @@
+# Godot
+.godot/
+*.translation
+
+# Exportaciones locales. Se versiona solo .gdignore para que Godot no
+# reimporte los binarios generados dentro del proyecto.
+build/*
+!build/.gdignore
+
+# Sistema
+.DS_Store
+*.tmp
+agent-tools/

@@ -1,0 +1,10 @@
+{
+  "start_gold": 450,
+  "start_lives": 30,
+  "sell_ratio": 0.7,
+  "tower_gap": 58,
+  "group_gap": 1.15,
+  "split_spacing": 28,
+  "bonus_base": 60,
+  "bonus_per_wave": 15
+}

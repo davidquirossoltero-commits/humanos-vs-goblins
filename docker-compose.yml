@@ -1,0 +1,6 @@
+services:
+  humanos-vs-goblins:
+    build: .
+    ports:
+      - "8097:80"
+    restart: unless-stopped
