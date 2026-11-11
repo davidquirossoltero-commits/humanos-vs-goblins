@@ -73,8 +73,16 @@ func refresh() -> void:
 	lives_label.add_theme_color_override("font_color", Color("ffb0a4") if world.lives <= 10 else Color("ffe7b8"))
 	wave_label.text = world.wave_label()
 	preview_label.text = world.preview_text()
-	start_button.disabled = world.phase != "ready"
-	start_button.text = "Oleada en curso" if world.phase == "combat" else "Iniciar oleada"
+	var wait := world.seconds_until_next()
+	if world.phase == "combat":
+		start_button.disabled = true
+		start_button.text = "Oleada en curso"
+	elif wait >= 0:
+		start_button.disabled = false
+		start_button.text = "Adelantar (%d s)" % wait
+	else:
+		start_button.disabled = world.phase != "ready"
+		start_button.text = "Iniciar oleada"
 	speed_button.text = "×%d" % world.speed
 	sound_button.text = "Sonido" if world.sfx.enabled else "Mudo"
 	cancel_button.visible = world.placing != ""
@@ -297,7 +305,7 @@ func _overlay_copy() -> String:
 		return "La aldea está a salvo. Los goblins huyeron al bosque.\nVidas restantes: %d · Oro: %d" % [world.lives, world.gold]
 	if world.phase == "lost":
 		return "Los goblins derribaron la puerta. La aldea ha caído.\nCaíste en la oleada %d." % maxi(world.wave_number, 1)
-	return "Los goblins marchan hacia la puerta del castillo. Elige una torre, toca el prado y resiste 10 oleadas.\n\nTeclas 1, 2 y 3 eligen torre. Espacio inicia la oleada. El botón ×2 acelera el combate."
+	return "Los goblins marchan hacia la puerta del castillo. Elige una torre, toca el prado y resiste 10 oleadas.\n\nTeclas 1, 2 y 3 eligen torre. Espacio lanza la primera oleada; las demás salen solas. El botón ×2 acelera el combate."
 
 
 func _on_overlay_button() -> void:

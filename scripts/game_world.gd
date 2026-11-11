@@ -38,6 +38,9 @@ var toast_text := ""
 var toast_until := 0
 var banner_text := ""
 var banner_until := 0
+var auto_next_at := -1.0
+
+const WAVE_BREATHER := 4.0
 
 var _next := 1
 var _pending_dead: Array = []
@@ -106,6 +109,7 @@ func restart() -> void:
 	selected_id = -1
 	toast_text = ""
 	banner_text = ""
+	auto_next_at = -1.0
 	_pending_dead.clear()
 	_pending_spawns.clear()
 	sfx.unlock()
@@ -240,6 +244,7 @@ func start_wave() -> void:
 	spawn_i = 0
 	wave_time = 0.0
 	phase = "combat"
+	auto_next_at = -1.0
 	banner_text = ""
 	sfx.play("wave")
 	changed.emit()
@@ -266,7 +271,16 @@ func preview_text() -> String:
 	if index < 0 or index >= catalog.waves.size():
 		return ""
 	var prefix := "En curso: " if phase == "combat" else "Siguiente: "
+	var wait := seconds_until_next()
+	if wait >= 0:
+		prefix = "Siguiente en %d s: " % wait
 	return prefix + WaveLogic.describe(catalog.waves[index], catalog.enemies)
+
+
+func seconds_until_next() -> int:
+	if phase != "ready" or auto_next_at < 0.0:
+		return -1
+	return maxi(int(ceil(auto_next_at - now)), 0)
 
 
 func current_toast() -> String:
@@ -309,6 +323,8 @@ func draw_dynamic(c: CanvasItem) -> void:
 
 func _tick(dt: float) -> void:
 	now += dt
+	if phase == "ready" and auto_next_at >= 0.0 and now >= auto_next_at:
+		start_wave()
 	if phase == "combat":
 		_spawn_due()
 		wave_time += dt
@@ -553,8 +569,9 @@ func _check_clear() -> void:
 		sfx.play("win")
 	else:
 		phase = "ready"
-		banner_text = "Oleada %d superada. +%d de oro." % [wave_number, bonus]
-		banner_until = Time.get_ticks_msec() + 2400
+		auto_next_at = now + WAVE_BREATHER
+		banner_text = "Oleada %d superada. +%d de oro. La siguiente sale sola." % [wave_number, bonus]
+		banner_until = Time.get_ticks_msec() + 3200
 		sfx.play("wave")
 		changed.emit()
 

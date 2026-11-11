@@ -187,6 +187,14 @@ func _test_smoke_and_match() -> void:
 		main.world.advance(0.1)
 		guard += 1
 	check(not main.world.enemies.is_empty(), "salen goblins al empezar la oleada")
+	var guard_clear := 0
+	while main.world.phase == "combat" and guard_clear < 500:
+		main.world.advance(0.2)
+		guard_clear += 1
+	check(main.world.phase == "ready", "la primera oleada termina y deja un respiro")
+	check(main.world.seconds_until_next() > 0, "la cuenta atrás de la siguiente oleada está activa")
+	main.world.advance(5.0)
+	check(main.world.phase == "combat" and main.world.wave_number == 2, "la oleada 2 empieza sola")
 	main.queue_free()
 
 	var match_scene := packed.instantiate()
