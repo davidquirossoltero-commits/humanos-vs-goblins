@@ -18,9 +18,10 @@ static func draw_tower(c: CanvasItem, kind: String, pos: Vector2, aim: float, al
 	var tint := Color(1, 1, 1, alpha)
 	var used := height
 	if used <= 0.0:
-		used = 158.0 if kind == "canon" else 146.0
+		used = 78.0 if kind == "canon" else 88.0
 	if kind == "canon":
-		_sprite(c, "canon", pos, used, aim, false, tint)
+		# El cañón se queda plantado. El proyectil sale hacia el blanco, la cureña no gira.
+		_sprite(c, "canon", pos, used, 0.0, false, tint)
 	else:
 		var flip := cos(aim) < 0.0
 		_sprite(c, kind, pos, used, 0.0, flip, tint)
@@ -29,15 +30,15 @@ static func draw_tower(c: CanvasItem, kind: String, pos: Vector2, aim: float, al
 static func enemy_scale(look: String) -> float:
 	match look:
 		"jinete":
-			return 150.0
+			return 86.0
 		"hobgoblin":
-			return 128.0
+			return 74.0
 		"ogro_armadura", "ogro":
-			return 168.0
+			return 96.0
 		"trol", "trol_furia":
-			return 190.0
+			return 108.0
 		_:
-			return 112.0
+			return 62.0
 
 
 static func _sprite(c: CanvasItem, key: String, pos: Vector2, height: float, rotation: float, flip: bool, tint: Color) -> void:

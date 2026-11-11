@@ -408,7 +408,7 @@ func _spawn_shot(tower: Dictionary, stats: Dictionary, target: Dictionary) -> vo
 	var aim := float(tower.aim)
 	var kind := str(catalog.tower(str(tower.def_id)).kind)
 	var shot_speed := float(stats.projectile_speed)
-	var from := origin + Vector2.RIGHT.rotated(aim) * 26.0
+	var from := origin + Vector2(30, -6) if kind == "shell" else origin + Vector2.RIGHT.rotated(aim) * 18.0
 	var dest := Vector2(float(target.x), float(target.y))
 	if kind == "shell":
 		dest = _lead(origin, int(target.id), shot_speed)
