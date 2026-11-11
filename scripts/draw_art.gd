@@ -14,28 +14,30 @@ static func draw_enemy(c: CanvasItem, pos: Vector2, look: String, scale: float, 
 	_sprite(c, look, pos, scale, 0.0, false, tint)
 
 
-static func draw_tower(c: CanvasItem, kind: String, pos: Vector2, aim: float, alpha: float) -> void:
+static func draw_tower(c: CanvasItem, kind: String, pos: Vector2, aim: float, alpha: float, height: float = -1.0) -> void:
 	var tint := Color(1, 1, 1, alpha)
+	var used := height
+	if used <= 0.0:
+		used = 158.0 if kind == "canon" else 146.0
 	if kind == "canon":
-		_sprite(c, "canon", pos, 118.0, aim, false, tint)
+		_sprite(c, "canon", pos, used, aim, false, tint)
 	else:
 		var flip := cos(aim) < 0.0
-		var height := 124.0 if kind == "mago" else 118.0
-		_sprite(c, kind, pos, height, 0.0, flip, tint)
+		_sprite(c, kind, pos, used, 0.0, flip, tint)
 
 
 static func enemy_scale(look: String) -> float:
 	match look:
 		"jinete":
-			return 118.0
+			return 150.0
 		"hobgoblin":
-			return 102.0
+			return 128.0
 		"ogro_armadura", "ogro":
-			return 136.0
+			return 168.0
 		"trol", "trol_furia":
-			return 156.0
+			return 190.0
 		_:
-			return 84.0
+			return 112.0
 
 
 static func _sprite(c: CanvasItem, key: String, pos: Vector2, height: float, rotation: float, flip: bool, tint: Color) -> void:

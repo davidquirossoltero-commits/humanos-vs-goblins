@@ -38,6 +38,7 @@ var _normal_style: StyleBoxFlat
 func setup(game: GameWorld) -> void:
 	world = game
 	mouse_filter = MOUSE_FILTER_IGNORE
+	z_index = 20
 	set_anchors_preset(PRESET_FULL_RECT)
 	_build_theme()
 	_build_bar()
@@ -253,6 +254,8 @@ func _build_toast() -> void:
 func _build_overlay() -> void:
 	overlay = Control.new()
 	overlay.mouse_filter = MOUSE_FILTER_STOP
+	overlay.z_as_relative = false
+	overlay.z_index = 200
 	overlay.set_anchors_preset(PRESET_FULL_RECT)
 	add_child(overlay)
 	var dim := ColorRect.new()

@@ -13,9 +13,14 @@ func _ready() -> void:
 	add_child(bg)
 	world = GameWorld.new()
 	add_child(world)
+	# El campo y las unidades viven en la capa 0. El HUD va en su propia capa
+	# para que el cartel de victoria, la cuenta atrás y la tienda tapen a los jugadores.
+	var ui := CanvasLayer.new()
+	ui.layer = 20
+	add_child(ui)
 	hud = GameHud.new()
 	hud.setup(world)
-	add_child(hud)
+	ui.add_child(hud)
 	world.changed.connect(hud.refresh)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
