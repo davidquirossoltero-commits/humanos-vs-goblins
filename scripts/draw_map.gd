@@ -15,9 +15,13 @@ static func render(c: CanvasItem, map: Dictionary) -> void:
 	var pts := PackedVector2Array()
 	for waypoint in map.waypoints:
 		pts.append(Vector2(float(waypoint.x), float(waypoint.y)))
-	_sausage(c, pts, 36.0, Color("f4f1ea"))
-	_sausage(c, pts, 30.0, Color("6a4a2e"))
-	_sausage(c, pts, 22.0, Color("8d6844"))
+	var wall := PackedVector2Array()
+	for point in pts:
+		wall.append(point + Vector2(10, 18))
+	_sausage(c, wall, 34.0, Color(0.08, 0.05, 0.03, 0.45))
+	_sausage(c, pts, 32.0, Color("4a3018"))
+	_sausage(c, pts, 26.0, Color("8d6844"))
+	_sausage(c, pts, 14.0, Color("c4a074"))
 	_pebbles(c, pts, rng)
 	if pts.size() >= 2:
 		_label(c, Vector2(8, pts[1].y - 78), "TÚNEL")

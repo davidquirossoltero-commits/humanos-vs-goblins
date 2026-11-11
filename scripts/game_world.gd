@@ -36,6 +36,7 @@ var base_position := Vector2.ZERO
 var base_scale := Vector2.ONE
 var campaign: Dictionary = {}
 var chapter := 0
+var paused := false
 var cleared: Array = []
 var _base_waves: Array = []
 var _base_map: Dictionary = {}
@@ -69,10 +70,22 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if paused:
+		return
 	_update_pointer()
 	var scale := float(speed) if phase == "combat" else 1.0
 	advance(minf(delta * scale, 0.15))
 	_apply_xform()
+
+
+func toggle_pause() -> void:
+	if phase != "ready" and phase != "combat":
+		return
+	paused = not paused
+	if paused:
+		placing = ""
+		selected_id = -1
+	changed.emit()
 
 
 func advance(seconds: float) -> void:
@@ -100,6 +113,7 @@ func start_chapter(index: int) -> void:
 	if index < 0 or index >= chapter_count():
 		return
 	chapter = index
+	paused = false
 	_apply_chapter()
 	_reset_match()
 	phase = "ready"
@@ -109,6 +123,7 @@ func start_chapter(index: int) -> void:
 
 
 func go_menu() -> void:
+	paused = false
 	chapter = 0
 	catalog.waves = _base_waves.duplicate(true)
 	catalog.map = _base_map.duplicate(true)
@@ -148,6 +163,7 @@ func has_next_chapter() -> bool:
 
 
 func restart() -> void:
+	paused = false
 	_apply_chapter()
 	_reset_match()
 	phase = "ready"
@@ -227,14 +243,12 @@ func toggle_speed() -> void:
 
 
 func toggle_sound() -> void:
-	sfx.enabled = not sfx.enabled
-	if sfx.enabled:
-		sfx.unlock()
+	sfx.set_muted(sfx.enabled)
 	changed.emit()
 
 
 func pick_tower(id: String) -> void:
-	if phase == "menu" or phase == "won" or phase == "lost":
+	if paused or phase == "menu" or phase == "won" or phase == "lost":
 		return
 	if placing == id:
 		placing = ""
@@ -261,7 +275,7 @@ func clear_selection() -> void:
 func try_place(x: float, y: float) -> String:
 	if placing == "":
 		return "Elige una torre de la tienda."
-	if phase == "menu" or phase == "won" or phase == "lost":
+	if paused or phase == "menu" or phase == "won" or phase == "lost":
 		return "Ahora no puedes construir."
 	var definition := catalog.tower(placing)
 	var cost := int(definition.cost)
@@ -821,7 +835,7 @@ func _apply_xform() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if phase == "menu" or phase == "won" or phase == "lost":
+	if paused or phase == "menu" or phase == "won" or phase == "lost":
 		return
 	if event is InputEventMouseButton and event.pressed:
 		var button := event as InputEventMouseButton

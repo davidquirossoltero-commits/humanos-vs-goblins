@@ -47,7 +47,9 @@ func _input(event: InputEvent) -> void:
 	match key.keycode:
 		KEY_SPACE:
 			get_viewport().set_input_as_handled()
-			if world.phase == "menu":
+			if world.paused:
+				world.toggle_pause()
+			elif world.phase == "menu":
 				world.play()
 			elif world.phase == "ready":
 				world.start_wave()
@@ -63,9 +65,14 @@ func _input(event: InputEvent) -> void:
 			world.pick_tower("canon")
 			get_viewport().set_input_as_handled()
 		KEY_ESCAPE:
-			world.cancel_place()
-			world.clear_selection()
 			get_viewport().set_input_as_handled()
+			if world.phase == "menu":
+				if hud.menu_page != "title":
+					hud.menu_page = "title"
+					hud._overlay_phase = ""
+					hud.refresh()
+			elif world.phase == "ready" or world.phase == "combat":
+				world.toggle_pause()
 		KEY_F:
 			world.toggle_speed()
 			get_viewport().set_input_as_handled()

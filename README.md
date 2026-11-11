@@ -36,7 +36,8 @@ El juego se estira para llenar la ventana (en móvil, mejor en horizontal). Rat�
 | --- | --- |
 | Elegir torre | Botones Arquero, Mago y Cañón, o las teclas 1, 2 y 3 |
 | Construir | Clic o toque en el prado. El círculo verde marca un sitio válido |
-| Cancelar | Botón Cancelar, clic derecho o Escape |
+| Pausa | Escape abre el menú y detiene el partido. Continuar, Reiniciar capítulo o Menú principal. Espacio también continúa |
+| Cancelar colocación | Botón Cancelar o clic derecho |
 | Mejorar o vender | Clic en una torre ya puesta |
 | Objetivo | En el panel de la torre: Primero, El más fuerte, Último, El más cercano |
 | Empezar oleada | Sale sola: la primera a los 3 s de pulsar Jugar, y las demás a los 2,5 s de terminar la anterior. Espacio o Empezar ya la adelantan |

@@ -34,6 +34,7 @@ var menu_page := "title"
 var story_button: Button
 var levels_button: Button
 var back_button: Button
+var restart_button: Button
 var chapter_box: VBoxContainer
 var chapter_buttons: Array = []
 var _card_key := ""
@@ -342,16 +343,24 @@ func _build_overlay() -> void:
 	back_button = _button("Menú")
 	back_button.custom_minimum_size = Vector2(220, 46)
 	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	restart_button = _button("Reiniciar capítulo")
+	restart_button.custom_minimum_size = Vector2(260, 46)
+	restart_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	restart_button.pressed.connect(func() -> void:
+		world.paused = false
+		world.restart()
+	)
+	box.add_child(restart_button)
 	back_button.pressed.connect(_on_back)
 	box.add_child(back_button)
 
 
 func _refresh_overlay() -> void:
-	var show := world.phase == "menu" or world.phase == "won" or world.phase == "lost"
+	var show := world.paused or world.phase == "menu" or world.phase == "won" or world.phase == "lost"
 	overlay.visible = show
-	bar.visible = not show
+	bar.visible = world.phase == "ready" or world.phase == "combat"
 	overlay.mouse_filter = MOUSE_FILTER_STOP if show else MOUSE_FILTER_IGNORE
-	var page := menu_page if world.phase == "menu" else world.phase
+	var page := "paused" if world.paused else (menu_page if world.phase == "menu" else world.phase)
 	if not show or (_overlay_phase == page and world.phase != "menu"):
 		if show and world.phase != "menu":
 			overlay_body.text = _overlay_copy()
@@ -369,6 +378,7 @@ func _fill_overlay(page: String) -> void:
 	levels_button.visible = false
 	chapter_box.visible = false
 	back_button.visible = false
+	restart_button.visible = false
 	overlay_button.visible = true
 	overlay_body.custom_minimum_size = Vector2(520, 96)
 	if page == "title":
@@ -395,6 +405,13 @@ func _fill_overlay(page: String) -> void:
 			var button: Button = chapter_buttons[i]
 			var mark := "  ·  superado" if world.chapter_cleared(i) else ""
 			button.text = world.chapter_name(i) + mark
+	elif page == "paused":
+		overlay_title.text = "Pausa"
+		overlay_button.text = "Continuar"
+		restart_button.visible = true
+		back_button.visible = true
+		back_button.text = "Menú principal"
+		overlay_body.text = "El partido está detenido. Escape o Continuar lo reanudan."
 	elif page == "won":
 		var last := not world.has_next_chapter()
 		overlay_title.text = "¡La copa es del Roble!" if last else "¡Capítulo superado!"
@@ -420,6 +437,9 @@ func _overlay_copy() -> String:
 
 func _on_overlay_button() -> void:
 	world.sfx.unlock()
+	if world.paused:
+		world.toggle_pause()
+		return
 	if world.phase == "menu":
 		menu_page = "title"
 		world.chapter = 0
@@ -436,6 +456,11 @@ func _on_overlay_button() -> void:
 
 func _on_back() -> void:
 	world.sfx.unlock()
+	if world.paused:
+		menu_page = "title"
+		_overlay_phase = ""
+		world.go_menu()
+		return
 	if world.phase == "menu":
 		menu_page = "title"
 		_overlay_phase = ""

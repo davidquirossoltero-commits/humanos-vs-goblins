@@ -46,9 +46,13 @@ static func _sprite(c: CanvasItem, key: String, pos: Vector2, height: float, rot
 	if texture == null:
 		c.draw_circle(pos, 18.0, Color("c4312e"))
 		return
+	var depth := lerpf(0.74, 1.28, clampf(pos.y / 720.0, 0.0, 1.0))
+	var used_h := height * depth
 	var aspect := float(texture.get_width()) / float(texture.get_height())
-	var width := height * aspect
+	var width := used_h * aspect
 	var sign := -1.0 if flip else 1.0
-	c.draw_set_transform(pos, rotation, Vector2(sign, 1.0))
-	c.draw_texture_rect(texture, Rect2(-width * 0.5, -height * 0.5, width, height), false, tint)
+	c.draw_set_transform(pos + Vector2(8.0 * depth, 6.0), 0.0, Vector2(width * 0.38, used_h * 0.09))
+	c.draw_circle(Vector2.ZERO, 1.0, Color(0, 0, 0, 0.4))
+	c.draw_set_transform(pos + Vector2(0, -used_h * 0.38), rotation, Vector2(sign, 1.0))
+	c.draw_texture_rect(texture, Rect2(-width * 0.5, -used_h * 0.5, width, used_h), false, tint)
 	c.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
