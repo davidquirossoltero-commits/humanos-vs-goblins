@@ -5,25 +5,23 @@ extends RefCounted
 static func render(c: CanvasItem, map: Dictionary) -> void:
 	var width := float(map.width)
 	var height := float(map.height)
-	c.draw_rect(Rect2(0, 0, width, height), Color("6fbf4e"), true)
+	var pitch := ArtBank.tex("pitch")
+	if pitch:
+		c.draw_texture_rect(pitch, Rect2(0, 0, width, height), false)
+	else:
+		c.draw_rect(Rect2(0, 0, width, height), Color("1f7a34"), true)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1337
-	for _i in 70:
-		var blob := Color("8ed463") if rng.randf() > 0.45 else Color("59a43a")
-		c.draw_circle(Vector2(rng.randf_range(0, width), rng.randf_range(0, height)), rng.randf_range(16, 54), blob)
 	var pts := PackedVector2Array()
 	for waypoint in map.waypoints:
 		pts.append(Vector2(float(waypoint.x), float(waypoint.y)))
-	_sausage(c, pts, 40.0, Color("5a3a22"))
-	_sausage(c, pts, 31.0, Color("c4a06a"))
-	_sausage(c, pts, 16.0, Color("e2c48a"))
+	_sausage(c, pts, 36.0, Color("f4f1ea"))
+	_sausage(c, pts, 30.0, Color("6a4a2e"))
+	_sausage(c, pts, 22.0, Color("8d6844"))
 	_pebbles(c, pts, rng)
-	_props(c, map, pts, rng)
 	if pts.size() >= 2:
-		_cave(c, Vector2(42, pts[1].y))
-		_castle(c, pts[pts.size() - 1])
-	_label(c, Vector2(18, 168), "CUEVA")
-	_label(c, Vector2(1128, 430), "CASTILLO")
+		_label(c, Vector2(8, pts[1].y - 78), "TÚNEL")
+		_label(c, pts[pts.size() - 1] + Vector2(-10, -78), "META")
 
 
 static func _sausage(c: CanvasItem, pts: PackedVector2Array, radius: float, color: Color) -> void:

@@ -39,7 +39,7 @@ El juego se estira para llenar la ventana (en móvil, mejor en horizontal). Rat�
 | Cancelar | Botón Cancelar, clic derecho o Escape |
 | Mejorar o vender | Clic en una torre ya puesta |
 | Objetivo | En el panel de la torre: Primero, El más fuerte, Último, El más cercano |
-| Empezar oleada | Iniciar oleada, o Espacio. Las siguientes salen solas a los 4 s; el botón las adelanta |
+| Empezar oleada | Sale sola: la primera a los 3 s de pulsar Jugar, y las demás a los 2,5 s de terminar la anterior. Espacio o Empezar ya la adelantan |
 | Acelerar | Botón ×2, o la tecla F |
 | Sonido | Botón Sonido |
 | Jugar / reintentar | El botón del cartel, Espacio o Enter no hace falta: Espacio también reinicia al terminar |

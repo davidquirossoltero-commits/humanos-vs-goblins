@@ -17,6 +17,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".pck": "application/octet-stream",
     })
 
+    def end_headers(self) -> None:
+        self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
 
 os.chdir(ROOT)
 with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:

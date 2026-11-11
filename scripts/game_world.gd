@@ -40,7 +40,8 @@ var banner_text := ""
 var banner_until := 0
 var auto_next_at := -1.0
 
-const WAVE_BREATHER := 4.0
+const WAVE_BREATHER := 2.5
+const FIRST_WAVE_DELAY := 3.0
 
 var _next := 1
 var _pending_dead: Array = []
@@ -84,6 +85,7 @@ func play() -> void:
 	if phase != "menu":
 		return
 	phase = "ready"
+	auto_next_at = now + FIRST_WAVE_DELAY
 	sfx.unlock()
 	changed.emit()
 
@@ -109,7 +111,7 @@ func restart() -> void:
 	selected_id = -1
 	toast_text = ""
 	banner_text = ""
-	auto_next_at = -1.0
+	auto_next_at = FIRST_WAVE_DELAY
 	_pending_dead.clear()
 	_pending_spawns.clear()
 	sfx.unlock()
@@ -270,10 +272,10 @@ func preview_text() -> String:
 	var index := wave_number if phase != "combat" else wave_number - 1
 	if index < 0 or index >= catalog.waves.size():
 		return ""
-	var prefix := "En curso: " if phase == "combat" else "Siguiente: "
 	var wait := seconds_until_next()
 	if wait >= 0:
-		prefix = "Siguiente en %d s: " % wait
+		return "La oleada %d empieza en %d s" % [mini(wave_number + 1, catalog.waves.size()), wait]
+	var prefix := "En curso: " if phase == "combat" else "Siguiente: "
 	return prefix + WaveLogic.describe(catalog.waves[index], catalog.enemies)
 
 

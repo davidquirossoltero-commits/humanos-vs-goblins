@@ -12,6 +12,7 @@ var sound_button: Button
 var cancel_button: Button
 var toast_label: Label
 var banner_label: Label
+var countdown_label: Label
 var bar: Panel
 var card: Panel
 var card_title: Label
@@ -79,7 +80,7 @@ func refresh() -> void:
 		start_button.text = "Oleada en curso"
 	elif wait >= 0:
 		start_button.disabled = false
-		start_button.text = "Adelantar (%d s)" % wait
+		start_button.text = "Empezar ya (%d)" % wait
 	else:
 		start_button.disabled = world.phase != "ready"
 		start_button.text = "Iniciar oleada"
@@ -97,6 +98,12 @@ func refresh() -> void:
 	toast_label.visible = toast_label.text != ""
 	banner_label.text = world.current_banner()
 	banner_label.visible = banner_label.text != ""
+	var countdown := world.seconds_until_next()
+	if countdown >= 0 and (world.phase == "ready"):
+		countdown_label.visible = true
+		countdown_label.text = "Oleada %d\nen %d" % [mini(world.wave_number + 1, world.catalog.waves.size()), countdown]
+	else:
+		countdown_label.visible = false
 	_refresh_overlay()
 	_refresh_card()
 
@@ -104,11 +111,11 @@ func refresh() -> void:
 func _build_theme() -> void:
 	var theme := Theme.new()
 	theme.default_font_size = 16
-	_normal_style = _box(Color("f0c14d"), Color("3a2414"), 10)
-	var hover := _box(Color("ffd56a"), Color("3a2414"), 10)
-	var pressed := _box(Color("d9a63a"), Color("3a2414"), 10)
-	var disabled := _box(Color("8d7350"), Color("3a2414"), 10)
-	_selected_style = _box(Color("b7e38a"), Color("1d4d28"), 10)
+	_normal_style = _box(Color("e2b43a"), Color("1a120c"), 10)
+	var hover := _box(Color("f0cc62"), Color("1a120c"), 10)
+	var pressed := _box(Color("b88828"), Color("1a120c"), 10)
+	var disabled := _box(Color("5c5348"), Color("1a120c"), 10)
+	_selected_style = _box(Color("d6453d"), Color("1a120c"), 10)
 	theme.set_stylebox("normal", "Button", _normal_style)
 	theme.set_stylebox("hover", "Button", hover)
 	theme.set_stylebox("pressed", "Button", pressed)
@@ -127,7 +134,7 @@ func _build_theme() -> void:
 func _build_bar() -> void:
 	bar = Panel.new()
 	bar.mouse_filter = MOUSE_FILTER_STOP
-	bar.add_theme_stylebox_override("panel", _box(Color("4a2e1c"), Color("1a0f08"), 0))
+	bar.add_theme_stylebox_override("panel", _box(Color("161311"), Color("8d1d22"), 0))
 	add_child(bar)
 	gold_label = _chip(bar, 8, 8, 128, 52)
 	lives_label = _chip(bar, 144, 8, 130, 52)
@@ -163,7 +170,7 @@ func _build_card() -> void:
 	card = Panel.new()
 	card.visible = false
 	card.mouse_filter = MOUSE_FILTER_STOP
-	card.add_theme_stylebox_override("panel", _box(Color("f6e2bc"), Color("3a2414"), 14))
+	card.add_theme_stylebox_override("panel", _box(Color("1c1612"), Color("c9a24a"), 14))
 	add_child(card)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(PRESET_FULL_RECT)
@@ -204,6 +211,8 @@ func _build_card() -> void:
 	close_button.custom_minimum_size = Vector2(84, 36)
 	close_button.pressed.connect(func() -> void: world.clear_selection())
 	row.add_child(close_button)
+	for label in [card_title, card_desc, card_stats]:
+		label.add_theme_color_override("font_color", Color("f6e7c4"))
 
 
 func _build_toast() -> void:
@@ -223,6 +232,22 @@ func _build_toast() -> void:
 	banner_label.custom_minimum_size = Vector2(520, 32)
 	banner_label.visible = false
 	add_child(banner_label)
+	countdown_label = Label.new()
+	countdown_label.mouse_filter = MOUSE_FILTER_IGNORE
+	countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	countdown_label.add_theme_font_size_override("font_size", 48)
+	countdown_label.add_theme_color_override("font_color", Color("2a160c"))
+	countdown_label.add_theme_color_override("font_outline_color", Color("fff6d0"))
+	countdown_label.add_theme_constant_override("outline_size", 10)
+	countdown_label.z_index = 25
+	countdown_label.visible = false
+	countdown_label.set_anchors_preset(PRESET_CENTER)
+	countdown_label.offset_left = -220
+	countdown_label.offset_right = 220
+	countdown_label.offset_top = -70
+	countdown_label.offset_bottom = 70
+	add_child(countdown_label)
 
 
 func _build_overlay() -> void:
@@ -305,7 +330,7 @@ func _overlay_copy() -> String:
 		return "La aldea está a salvo. Los goblins huyeron al bosque.\nVidas restantes: %d · Oro: %d" % [world.lives, world.gold]
 	if world.phase == "lost":
 		return "Los goblins derribaron la puerta. La aldea ha caído.\nCaíste en la oleada %d." % maxi(world.wave_number, 1)
-	return "Los goblins marchan hacia la puerta del castillo. Elige una torre, toca el prado y resiste 10 oleadas.\n\nTeclas 1, 2 y 3 eligen torre. Espacio lanza la primera oleada; las demás salen solas. El botón ×2 acelera el combate."
+	return "Los goblins marchan hacia la puerta del castillo. Elige una torre, toca el prado y resiste 10 oleadas.\n\nAl pulsar Jugar, la oleada 1 sale sola a los 3 segundos. Las demás siguen solas. Espacio o Empezar ya las adelantan."
 
 
 func _on_overlay_button() -> void:
@@ -377,7 +402,7 @@ func _comma(value: float) -> String:
 
 func _chip(parent: Node, x: float, y: float, w: float, h: float) -> Label:
 	var panel := Panel.new()
-	panel.add_theme_stylebox_override("panel", _box(Color("3a2415"), Color("1a0f08"), 8))
+	panel.add_theme_stylebox_override("panel", _box(Color("100e0c"), Color("c9a24a"), 8))
 	_place(parent, panel, x, y, w, h)
 	var label := Label.new()
 	label.set_anchors_preset(PRESET_FULL_RECT)
