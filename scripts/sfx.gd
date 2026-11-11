@@ -10,7 +10,6 @@ var _playback: AudioStreamGeneratorPlayback
 var _voices: Array = []
 var _rate := 22050.0
 var _rng := RandomNumberGenerator.new()
-var _music: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -26,14 +25,6 @@ func _ready() -> void:
 	_player.volume_db = 0.0
 	add_child(_player)
 	_rng.seed = 17
-	_music = AudioStreamPlayer.new()
-	var loaded := load("res://audio/stadium.wav") as AudioStream
-	if loaded is AudioStreamWAV:
-		(loaded as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
-	_music.stream = loaded
-	_music.volume_db = -16.0
-	add_child(_music)
-	_music.play()
 	_ensure_playing()
 
 
@@ -80,18 +71,12 @@ func _process(_delta: float) -> void:
 func unlock() -> void:
 	_resume_web_audio()
 	_ensure_playing()
-	if _music and enabled and not _music.playing:
-		_music.play()
 	_add(660.0, 740.0, 0.09, 0.42, 2, 0.0)
 
 
 func set_muted(turn_off: bool) -> void:
 	enabled = not turn_off
 	set_process(enabled)
-	if _music:
-		_music.stream_paused = not enabled
-		if enabled and not _music.playing:
-			_music.play()
 	if enabled:
 		unlock()
 

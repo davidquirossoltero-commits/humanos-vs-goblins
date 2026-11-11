@@ -14,7 +14,7 @@ Hecho con **Godot 4.7** (GDScript). La interfaz del juego está en español.
 - Al colocar una torre se ve el círculo de alcance. Si pulsas una torre ya puesta puedes mejorarla, venderla (70 % del oro invertido) o cambiar el objetivo: Primero, El más fuerte, Último, El más cercano.
 - Cinco enemigos con capas, al estilo de los globos: el ogro pierde la armadura y luego suelta hobgoblins; el hobgoblin suelta goblins; el jinete deja un goblin a pie; el trol entra en furia y al caer suelta un hobgoblin y dos goblins.
 - El menú abre la crónica, elige capítulo o entra directo al prado. El primer capítulo tiene 10 oleadas, cada una más pesada. Los otros dos usan los tramos más duros de esa lista. Oro por baja y por oleada superada. Si un goblin entra en la meta, pierdes vidas según lo que todavía lleva dentro. Al ganar un capítulo se guarda la marca de superado. Si las vidas llegan a cero, derrota. Se puede reintentar o volver al menú.
-- Botón de velocidad ×2, efectos y una música suave de estadio (órgano, murmullo y un tambor lejano; se silencian con Sonido) y controles de ratón, dedo y teclado.
+- Botón de velocidad ×2, efectos de disparo y de oleada (se silencian con Sonido) y controles de ratón, dedo y teclado. No hay música de fondo.
 - Torres, enemigos, oleadas, mapa y economía viven en JSON (`data/`), para poder añadir más sin reescribir el combate.
 
 ## Requisitos

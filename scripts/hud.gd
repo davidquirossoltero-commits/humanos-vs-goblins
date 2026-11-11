@@ -386,7 +386,7 @@ func _fill_overlay(page: String) -> void:
 		overlay_button.text = "Jugar"
 		story_button.visible = true
 		levels_button.visible = true
-		overlay_body.text = "%s\n\n%s\n\nJugar abre el primer capítulo. La música del estadio entra con el primer clic." % [world.campaign_title(), world.chapter_blurb(0)]
+		overlay_body.text = "%s\n\n%s\n\nJugar abre el primer capítulo. El sonido entra con el primer clic." % [world.campaign_title(), world.chapter_blurb(0)]
 	elif page == "story":
 		overlay_title.text = world.campaign_title()
 		overlay_button.visible = false

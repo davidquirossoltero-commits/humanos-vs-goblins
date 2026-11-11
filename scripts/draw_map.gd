@@ -11,21 +11,147 @@ static func render(c: CanvasItem, map: Dictionary) -> void:
 	else:
 		c.draw_rect(Rect2(0, 0, width, height), Color("1f7a34"), true)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 1337
+	rng.seed = 1337 + hash(str(map.get("id", "robledal")))
 	var pts := PackedVector2Array()
 	for waypoint in map.waypoints:
 		pts.append(Vector2(float(waypoint.x), float(waypoint.y)))
-	var wall := PackedVector2Array()
-	for point in pts:
-		wall.append(point + Vector2(10, 18))
-	_sausage(c, wall, 34.0, Color(0.08, 0.05, 0.03, 0.45))
-	_sausage(c, pts, 32.0, Color("4a3018"))
-	_sausage(c, pts, 26.0, Color("8d6844"))
-	_sausage(c, pts, 14.0, Color("c4a074"))
-	_pebbles(c, pts, rng)
+	var theme := str(map.get("id", "robledal"))
+	_ground(c, map, pts, theme, rng)
+	_track(c, pts, theme, rng)
+	_canopy(c, map, pts, theme, rng)
 	if pts.size() >= 2:
 		_label(c, Vector2(8, pts[1].y - 78), "TÚNEL")
 		_label(c, pts[pts.size() - 1] + Vector2(-10, -78), "META")
+
+
+static func _track(c: CanvasItem, pts: PackedVector2Array, theme: String, rng: RandomNumberGenerator) -> void:
+	var lip := Color("3a2414")
+	var fill := Color("8d6844")
+	var wear := Color("c4a074")
+	var stone := Color("6e6256")
+	if theme == "foso":
+		lip = Color("2a140c")
+		fill = Color("6a4028")
+		wear = Color("8a5a32")
+		stone = Color("4a3024")
+	elif theme == "coliseo":
+		lip = Color("3e4652")
+		fill = Color("8a929c")
+		wear = Color("b7bec6")
+		stone = Color("5c656f")
+	var wall := PackedVector2Array()
+	for point in pts:
+		wall.append(point + Vector2(8, 16))
+	_sausage(c, wall, 40.0, Color(0, 0, 0, 0.38))
+	_sausage(c, pts, 36.0, lip)
+	_sausage(c, pts, 28.0, fill)
+	_sausage(c, pts, 16.0, wear)
+	for i in pts.size() - 1:
+		var a := pts[i]
+		var b := pts[i + 1]
+		var length := a.distance_to(b)
+		var dir := (b - a) / maxf(length, 1.0)
+		var normal := Vector2(-dir.y, dir.x)
+		var steps := maxi(int(length / 22.0), 1)
+		for s in steps:
+			var p := a.lerp(b, float(s) / float(steps))
+			var side := 1.0 if rng.randf() > 0.5 else -1.0
+			var rock := p + normal * side * rng.randf_range(16.0, 24.0) + Vector2(0, 3)
+			c.draw_circle(rock + Vector2(1, 3), rng.randf_range(3.2, 5.4), Color(0, 0, 0, 0.28))
+			c.draw_circle(rock, rng.randf_range(3.0, 5.0), stone)
+			c.draw_circle(rock + Vector2(-1.2, -1.4), 1.4, wear.lightened(0.25))
+
+
+static func _ground(c: CanvasItem, map: Dictionary, pts: PackedVector2Array, theme: String, rng: RandomNumberGenerator) -> void:
+	var tuft := Color("1f6b32")
+	var flower := Color("ffd24a")
+	if theme == "foso":
+		tuft = Color("3d4a22")
+		flower = Color("e07a32")
+	elif theme == "coliseo":
+		tuft = Color("2f6a48")
+		flower = Color("d7d2c4")
+	for _i in 42:
+		var broad := Vector2(rng.randf_range(48, 1232), rng.randf_range(124, 596))
+		if _near_path(map, pts, broad, 8.0):
+			continue
+		var wash := tuft.lightened(rng.randf_range(-0.05, 0.08))
+		wash.a = 0.38
+		c.draw_circle(broad, rng.randf_range(26.0, 54.0), wash)
+	for _i in 70:
+		var p := Vector2(rng.randf_range(50, 1230), rng.randf_range(130, 590))
+		if _near_path(map, pts, p, 18.0):
+			continue
+		var blob := tuft.lightened(rng.randf_range(-0.08, 0.12))
+		c.draw_circle(p + Vector2(0, 3), rng.randf_range(4.0, 9.0), Color(0, 0, 0, 0.12))
+		c.draw_circle(p, rng.randf_range(3.5, 8.0), blob)
+		if rng.randf() > 0.72:
+			c.draw_circle(p + Vector2(rng.randf_range(-3, 3), -2), 2.1, flower)
+
+
+static func _canopy(c: CanvasItem, map: Dictionary, pts: PackedVector2Array, theme: String, rng: RandomNumberGenerator) -> void:
+	var spots: Array[Vector2] = []
+	for _i in 80:
+		var p := Vector2(rng.randf_range(36, 1244), rng.randf_range(112, 600))
+		if _near_path(map, pts, p, 46.0):
+			continue
+		var crowded := false
+		for other in spots:
+			if other.distance_to(p) < 54.0:
+				crowded = true
+				break
+		if crowded:
+			continue
+		spots.append(p)
+		if spots.size() >= 22:
+			break
+	spots.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.y < b.y)
+	for p in spots:
+		if theme == "coliseo" and rng.randf() > 0.55:
+			_rock(c, p, rng.randf_range(0.8, 1.3))
+		elif theme == "foso" and rng.randf() > 0.62:
+			_torch(c, p)
+		else:
+			var autumn := theme != "foso" and rng.randf() > 0.55
+			_broad_tree(c, p, rng.randf_range(0.85, 1.35), autumn, theme)
+
+
+static func _broad_tree(c: CanvasItem, p: Vector2, scale: float, autumn: bool, theme: String) -> void:
+	var leaf := Color("2f8a32")
+	var dark := Color("1c4e22")
+	var light := Color("4aaa3e")
+	if theme == "foso":
+		leaf = Color("5a6230")
+		dark = Color("2c3418")
+		light = Color("7a8444")
+	elif autumn:
+		leaf = Color("e07a28")
+		dark = Color("a84818")
+		light = Color("f0b04a")
+	c.draw_set_transform(p + Vector2(2, 8) * scale, 0.0, Vector2(22, 8) * scale)
+	c.draw_circle(Vector2.ZERO, 1.0, Color(0, 0, 0, 0.32))
+	c.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	c.draw_rect(Rect2(p + Vector2(-4, -6) * scale, Vector2(8, 20) * scale), Color("5a3a22"), true)
+	c.draw_circle(p + Vector2(0, -22) * scale, 18 * scale, dark)
+	c.draw_circle(p + Vector2(-10, -12) * scale, 13 * scale, leaf)
+	c.draw_circle(p + Vector2(11, -14) * scale, 12 * scale, light)
+	c.draw_circle(p + Vector2(0, -28) * scale, 8 * scale, light.lightened(0.12))
+
+
+static func _rock(c: CanvasItem, p: Vector2, scale: float) -> void:
+	c.draw_set_transform(p + Vector2(2, 6) * scale, 0.0, Vector2(16, 6) * scale)
+	c.draw_circle(Vector2.ZERO, 1.0, Color(0, 0, 0, 0.3))
+	c.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	c.draw_circle(p + Vector2(-6, 0) * scale, 10 * scale, Color("5c656f"))
+	c.draw_circle(p + Vector2(8, 2) * scale, 8 * scale, Color("8a929c"))
+	c.draw_circle(p + Vector2(-2, -4) * scale, 4 * scale, Color("d5dbe2"))
+
+
+static func _torch(c: CanvasItem, p: Vector2) -> void:
+	c.draw_circle(p + Vector2(0, 10), 16, Color(1.0, 0.45, 0.1, 0.28))
+	c.draw_rect(Rect2(p + Vector2(-3, -2), Vector2(6, 16)), Color("5a3a22"), true)
+	c.draw_circle(p + Vector2(0, -6), 7, Color("ffb15a"))
+	c.draw_circle(p + Vector2(0, -8), 3.5, Color("fff1c4"))
 
 
 static func _sausage(c: CanvasItem, pts: PackedVector2Array, radius: float, color: Color) -> void:
