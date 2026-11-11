@@ -10,6 +10,8 @@ var _playback: AudioStreamGeneratorPlayback
 var _voices: Array = []
 var _rate := 22050.0
 var _rng := RandomNumberGenerator.new()
+var _music_time := 0.0
+var _crowd := 0.0
 
 
 func _ready() -> void:
@@ -25,6 +27,7 @@ func _ready() -> void:
 	_player.volume_db = 0.0
 	add_child(_player)
 	_rng.seed = 17
+	_ensure_playing()
 
 
 func _process(_delta: float) -> void:
@@ -63,6 +66,7 @@ func _process(_delta: float) -> void:
 				shaped = (1.0 if sine >= 0.0 else -1.0) if int(voice.shape) == 0 else sine
 			sample += shaped * env * float(voice.amp)
 		_voices = alive
+		sample += _stadium()
 		sample = clampf(sample, -1.0, 1.0)
 		_playback.push_frame(Vector2(sample, sample))
 
@@ -142,6 +146,21 @@ func _resume_web_audio() -> void:
 	if master >= 0:
 		AudioServer.set_bus_mute(master, false)
 		AudioServer.set_bus_volume_db(master, 0.0)
+
+
+func _stadium() -> float:
+	_music_time += 1.0 / _rate
+	var t := _music_time
+	var organ := sin(TAU * 98.0 * t) * 0.045
+	organ += sin(TAU * 146.8 * t) * 0.028
+	organ += sin(TAU * 196.0 * t) * 0.016
+	var swell := 0.72 + 0.28 * sin(t * 0.33)
+	var beat := fmod(t, 1.15)
+	var drum := 0.0
+	if beat < 0.09:
+		drum = sin(TAU * 72.0 * beat) * (1.0 - beat / 0.09) * 0.07
+	_crowd += (_rng.randf_range(-1.0, 1.0) - _crowd) * 0.015
+	return organ * swell + drum + _crowd * 0.05
 
 
 func _add(freq: float, freq_to: float, dur: float, amp: float, shape: int, delay: float) -> void:

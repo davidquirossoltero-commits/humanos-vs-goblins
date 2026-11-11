@@ -34,6 +34,11 @@ var pointer_inside := false
 
 var base_position := Vector2.ZERO
 var base_scale := Vector2.ONE
+var campaign: Dictionary = {}
+var chapter := 0
+var cleared: Array = []
+var _base_waves: Array = []
+var _base_map: Dictionary = {}
 var toast_text := ""
 var toast_until := 0
 var banner_text := ""
@@ -57,6 +62,10 @@ func _ready() -> void:
 	add_child(sfx)
 	add_child(preload("res://scripts/map_view.gd").new())
 	add_child(preload("res://scripts/fx_view.gd").new())
+	campaign = Catalog._read("res://data/campaign.json")
+	_base_waves = catalog.waves.duplicate(true)
+	_base_map = catalog.map.duplicate(true)
+	_load_progress()
 
 
 func _process(delta: float) -> void:
@@ -84,17 +93,73 @@ func apply_layout(pos: Vector2, map_scale: float) -> void:
 func play() -> void:
 	if phase != "menu":
 		return
+	start_chapter(chapter)
+
+
+func start_chapter(index: int) -> void:
+	if index < 0 or index >= chapter_count():
+		return
+	chapter = index
+	_apply_chapter()
+	_reset_match()
 	phase = "ready"
 	auto_next_at = now + FIRST_WAVE_DELAY
 	sfx.unlock()
 	changed.emit()
 
 
+func go_menu() -> void:
+	chapter = 0
+	catalog.waves = _base_waves.duplicate(true)
+	catalog.map = _base_map.duplicate(true)
+	route = PathRoute.new(catalog.map.waypoints)
+	_reset_match()
+	phase = "menu"
+	auto_next_at = -1.0
+	changed.emit()
+
+
+func chapter_count() -> int:
+	return (campaign.get("chapters", []) as Array).size()
+
+
+func chapter_name(index: int) -> String:
+	return str(_chapter(index).get("name", "Capítulo"))
+
+
+func chapter_blurb(index: int) -> String:
+	return str(_chapter(index).get("blurb", ""))
+
+
+func chapter_cleared(index: int) -> bool:
+	return index >= 0 and index < cleared.size() and bool(cleared[index])
+
+
+func campaign_title() -> String:
+	return str(campaign.get("title", "Humanos vs Goblins"))
+
+
+func chronicle() -> String:
+	return str(campaign.get("chronicle", ""))
+
+
+func has_next_chapter() -> bool:
+	return chapter + 1 < chapter_count()
+
+
 func restart() -> void:
+	_apply_chapter()
+	_reset_match()
+	phase = "ready"
+	auto_next_at = FIRST_WAVE_DELAY
+	sfx.unlock()
+	changed.emit()
+
+
+func _reset_match() -> void:
 	gold = int(catalog.balance.start_gold)
 	lives = int(catalog.balance.start_lives)
 	wave_number = 0
-	phase = "ready"
 	speed = 1
 	now = 0.0
 	towers.clear()
@@ -111,11 +176,49 @@ func restart() -> void:
 	selected_id = -1
 	toast_text = ""
 	banner_text = ""
-	auto_next_at = FIRST_WAVE_DELAY
+	auto_next_at = -1.0
 	_pending_dead.clear()
 	_pending_spawns.clear()
-	sfx.unlock()
-	changed.emit()
+
+
+func _chapter(index: int) -> Dictionary:
+	var chapters: Array = campaign.get("chapters", [])
+	if index < 0 or index >= chapters.size():
+		return {}
+	return chapters[index]
+
+
+func _apply_chapter() -> void:
+	var entry := _chapter(chapter)
+	if entry.is_empty():
+		return
+	if bool(entry.get("use_base_map", false)):
+		catalog.map = _base_map.duplicate(true)
+	else:
+		catalog.map = (entry.map as Dictionary).duplicate(true)
+	catalog.map["pitch"] = str(entry.get("pitch", "pitch"))
+	var start := int(entry.get("wave_from", 0))
+	var finish := int(entry.get("wave_to", _base_waves.size()))
+	var slice: Array = []
+	for i in range(start, mini(finish, _base_waves.size())):
+		slice.append(_base_waves[i])
+	catalog.waves = slice
+	route = PathRoute.new(catalog.map.waypoints)
+
+
+func _load_progress() -> void:
+	cleared.clear()
+	var file := ConfigFile.new()
+	var found := file.load("user://copa_del_robledal.cfg") == OK
+	for i in chapter_count():
+		cleared.append(found and bool(file.get_value("copa", "c%d" % i, false)))
+
+
+func _save_progress() -> void:
+	var file := ConfigFile.new()
+	for i in cleared.size():
+		file.set_value("copa", "c%d" % i, bool(cleared[i]))
+	file.save("user://copa_del_robledal.cfg")
 
 
 func toggle_speed() -> void:
@@ -263,9 +366,9 @@ func wave_label() -> String:
 
 func preview_text() -> String:
 	if phase == "won":
-		return "La aldea está a salvo"
+		return chapter_name(chapter)
 	if phase == "lost":
-		return "La puerta ha caído"
+		return "La meta ha caído"
 	if placing != "":
 		var definition := catalog.tower(placing)
 		return "Coloca: %s. Toca el prado. Clic derecho cancela." % definition.name
@@ -274,7 +377,7 @@ func preview_text() -> String:
 		return ""
 	var wait := seconds_until_next()
 	if wait >= 0:
-		return "La oleada %d empieza en %d s" % [mini(wave_number + 1, catalog.waves.size()), wait]
+		return "%s. La oleada %d empieza en %d s" % [chapter_name(chapter), mini(wave_number + 1, catalog.waves.size()), wait]
 	var prefix := "En curso: " if phase == "combat" else "Siguiente: "
 	return prefix + WaveLogic.describe(catalog.waves[index], catalog.enemies)
 
@@ -568,6 +671,9 @@ func _check_clear() -> void:
 	if wave_number >= catalog.waves.size():
 		phase = "won"
 		banner_text = ""
+		if chapter >= 0 and chapter < cleared.size():
+			cleared[chapter] = true
+			_save_progress()
 		sfx.play("win")
 	else:
 		phase = "ready"

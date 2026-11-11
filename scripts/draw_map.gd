@@ -5,7 +5,7 @@ extends RefCounted
 static func render(c: CanvasItem, map: Dictionary) -> void:
 	var width := float(map.width)
 	var height := float(map.height)
-	var pitch := ArtBank.tex("pitch")
+	var pitch := ArtBank.tex(str(map.get("pitch", "pitch")))
 	if pitch:
 		c.draw_texture_rect(pitch, Rect2(0, 0, width, height), false)
 	else:

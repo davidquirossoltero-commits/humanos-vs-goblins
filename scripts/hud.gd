@@ -30,6 +30,12 @@ var overlay_body: Label
 var overlay_button: Button
 var emblem: Node2D
 var _overlay_phase := ""
+var menu_page := "title"
+var story_button: Button
+var levels_button: Button
+var back_button: Button
+var chapter_box: VBoxContainer
+var chapter_buttons: Array = []
 var _card_key := ""
 var _selected_style: StyleBoxFlat
 var _normal_style: StyleBoxFlat
@@ -265,10 +271,10 @@ func _build_overlay() -> void:
 	overlay.add_child(dim)
 	var panel := Panel.new()
 	panel.set_anchors_preset(PRESET_CENTER)
-	panel.offset_left = -300
-	panel.offset_right = 300
-	panel.offset_top = -220
-	panel.offset_bottom = 220
+	panel.offset_left = -320
+	panel.offset_right = 320
+	panel.offset_top = -300
+	panel.offset_bottom = 300
 	panel.add_theme_stylebox_override("panel", _box(Color("f6e2bc"), Color("3a2414"), 18))
 	overlay.add_child(panel)
 	var margin := MarginContainer.new()
@@ -303,44 +309,147 @@ func _build_overlay() -> void:
 	overlay_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	overlay_button.pressed.connect(_on_overlay_button)
 	box.add_child(overlay_button)
+	story_button = _button("Historia")
+	story_button.custom_minimum_size = Vector2(220, 46)
+	story_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	story_button.pressed.connect(func() -> void:
+		menu_page = "story"
+		world.sfx.unlock()
+		_overlay_phase = ""
+		refresh()
+	)
+	box.add_child(story_button)
+	levels_button = _button("Niveles")
+	levels_button.custom_minimum_size = Vector2(220, 46)
+	levels_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	levels_button.pressed.connect(func() -> void:
+		menu_page = "levels"
+		world.sfx.unlock()
+		_overlay_phase = ""
+		refresh()
+	)
+	box.add_child(levels_button)
+	chapter_box = VBoxContainer.new()
+	chapter_box.add_theme_constant_override("separation", 6)
+	chapter_box.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(chapter_box)
+	for i in world.chapter_count():
+		var chapter_button := _button(world.chapter_name(i))
+		chapter_button.custom_minimum_size = Vector2(460, 46)
+		chapter_button.pressed.connect(_on_chapter.bind(i))
+		chapter_box.add_child(chapter_button)
+		chapter_buttons.append(chapter_button)
+	back_button = _button("Menú")
+	back_button.custom_minimum_size = Vector2(220, 46)
+	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	back_button.pressed.connect(_on_back)
+	box.add_child(back_button)
 
 
 func _refresh_overlay() -> void:
 	var show := world.phase == "menu" or world.phase == "won" or world.phase == "lost"
 	overlay.visible = show
+	bar.visible = not show
 	overlay.mouse_filter = MOUSE_FILTER_STOP if show else MOUSE_FILTER_IGNORE
-	if not show or _overlay_phase == world.phase:
+	var page := menu_page if world.phase == "menu" else world.phase
+	if not show or (_overlay_phase == page and world.phase != "menu"):
 		if show and world.phase != "menu":
 			overlay_body.text = _overlay_copy()
 		return
-	_overlay_phase = world.phase
-	emblem.mode = world.phase
+	if _overlay_phase == page:
+		return
+	_overlay_phase = page
+	emblem.mode = "menu" if world.phase == "menu" else world.phase
 	emblem.queue_redraw()
-	if world.phase == "menu":
+	_fill_overlay(page)
+
+
+func _fill_overlay(page: String) -> void:
+	story_button.visible = false
+	levels_button.visible = false
+	chapter_box.visible = false
+	back_button.visible = false
+	overlay_button.visible = true
+	overlay_body.custom_minimum_size = Vector2(520, 96)
+	if page == "title":
 		overlay_title.text = "Humanos vs Goblins"
 		overlay_button.text = "Jugar"
-	elif world.phase == "won":
-		overlay_title.text = "¡Victoria!"
-		overlay_button.text = "Reiniciar"
+		story_button.visible = true
+		levels_button.visible = true
+		overlay_body.text = "%s\n\n%s\n\nJugar abre el primer capítulo. La música del estadio entra con el primer clic." % [world.campaign_title(), world.chapter_blurb(0)]
+	elif page == "story":
+		overlay_title.text = world.campaign_title()
+		overlay_button.visible = false
+		back_button.visible = true
+		back_button.text = "Volver"
+		overlay_body.custom_minimum_size = Vector2(520, 220)
+		overlay_body.text = world.chronicle()
+	elif page == "levels":
+		overlay_title.text = "Elige capítulo"
+		overlay_button.visible = false
+		chapter_box.visible = true
+		back_button.visible = true
+		back_button.text = "Volver"
+		overlay_body.text = "Tres campos, una copa. El orden del cronista es el del libro, y puedes entrar en cualquiera."
+		for i in chapter_buttons.size():
+			var button: Button = chapter_buttons[i]
+			var mark := "  ·  superado" if world.chapter_cleared(i) else ""
+			button.text = world.chapter_name(i) + mark
+	elif page == "won":
+		var last := not world.has_next_chapter()
+		overlay_title.text = "¡La copa es del Roble!" if last else "¡Capítulo superado!"
+		overlay_button.text = "Menú" if last else "Siguiente capítulo"
+		back_button.visible = not last
+		back_button.text = "Menú"
+		overlay_body.text = _overlay_copy()
 	else:
 		overlay_title.text = "Derrota"
 		overlay_button.text = "Reintentar"
-	overlay_body.text = _overlay_copy()
+		back_button.visible = true
+		back_button.text = "Menú"
+		overlay_body.text = _overlay_copy()
 
 
 func _overlay_copy() -> String:
 	if world.phase == "won":
-		return "La aldea está a salvo. Los goblins huyeron al bosque.\nVidas restantes: %d · Oro: %d" % [world.lives, world.gold]
+		return "%s\n\n%s\nVidas restantes: %d · Oro: %d" % [world.chapter_name(world.chapter), str(world._chapter(world.chapter).get("win", "")), world.lives, world.gold]
 	if world.phase == "lost":
-		return "Los goblins derribaron la puerta. La aldea ha caído.\nCaíste en la oleada %d." % maxi(world.wave_number, 1)
-	return "Los goblins marchan hacia la puerta del castillo. Elige una torre, toca el prado y resiste 10 oleadas.\n\nAl pulsar Jugar, la oleada 1 sale sola a los 3 segundos. Las demás siguen solas. Espacio o Empezar ya las adelantan."
+		return "%s se tuerce. Los goblins cruzan la meta.\nCaíste en la oleada %d." % [world.chapter_name(world.chapter), maxi(world.wave_number, 1)]
+	return ""
 
 
 func _on_overlay_button() -> void:
+	world.sfx.unlock()
 	if world.phase == "menu":
+		menu_page = "title"
+		world.chapter = 0
 		world.play()
+	elif world.phase == "won" and world.has_next_chapter():
+		world.start_chapter(world.chapter + 1)
+	elif world.phase == "won":
+		menu_page = "title"
+		_overlay_phase = ""
+		world.go_menu()
 	else:
 		world.restart()
+
+
+func _on_back() -> void:
+	world.sfx.unlock()
+	if world.phase == "menu":
+		menu_page = "title"
+		_overlay_phase = ""
+		refresh()
+	else:
+		menu_page = "title"
+		_overlay_phase = ""
+		world.go_menu()
+
+
+func _on_chapter(index: int) -> void:
+	world.sfx.unlock()
+	menu_page = "title"
+	world.start_chapter(index)
 
 
 func _refresh_card() -> void:

@@ -1,0 +1,82 @@
+{
+  "title": "La Copa del Robledal",
+  "chronicle": "El cronista abre el libro de la aldea.\n\nHace tres lunas, el clan de los Colmillos clavó un estandarte en el prado. No declaran una guerra: proponen un torneo de tres partidos por el camino del bosque. Reglas de taberna, público en la grada y una meta que no se puede ceder.\n\nSi el equipo del Roble gana los tres campos, el paso queda franco. Si cae, la aldea paga el peaje.\n\nCapítulo I. El prado del Roble. Se juega en casa, sobre el césped de la aldea.\nCapítulo II. El foso de los Colmillos. Barro, antorchas y un camino más sucio.\nCapítulo III. El coliseo. La final, bajo una grada de piedra.",
+  "chapters": [
+    {
+      "id": "roble",
+      "name": "I. El prado del Roble",
+      "pitch": "pitch",
+      "use_base_map": true,
+      "wave_from": 0,
+      "wave_to": 10,
+      "blurb": "La aldea defiende su propio césped. Doce goblins abren el desfile y el cronista aún no ha mojado la pluma.",
+      "win": "El prado aguanta. El cronista pasa la página: el siguiente campo ya está marcado en el mapa."
+    },
+    {
+      "id": "foso",
+      "name": "II. El foso de los Colmillos",
+      "pitch": "pitch_foso",
+      "use_base_map": false,
+      "wave_from": 3,
+      "wave_to": 9,
+      "blurb": "Hay que jugar de visita. El camino zigzaguea entre el barro y las antorchas del clan.",
+      "win": "El foso se queda sin voz. Solo queda la final, bajo la grada de piedra.",
+      "map": {
+        "id": "foso",
+        "name": "Foso de los Colmillos",
+        "width": 1280,
+        "height": 720,
+        "path_radius": 42,
+        "build_margin": 28,
+        "pitch": "pitch_foso",
+        "waypoints": [
+          {"x": -40, "y": 200},
+          {"x": 240, "y": 200},
+          {"x": 240, "y": 520},
+          {"x": 540, "y": 520},
+          {"x": 540, "y": 180},
+          {"x": 840, "y": 180},
+          {"x": 840, "y": 500},
+          {"x": 1140, "y": 500}
+        ],
+        "blocked": [
+          {"x": 0, "y": 140, "w": 78, "h": 150},
+          {"x": 1040, "y": 400, "w": 240, "h": 280}
+        ]
+      }
+    },
+    {
+      "id": "coliseo",
+      "name": "III. El coliseo",
+      "pitch": "pitch_coliseo",
+      "use_base_map": false,
+      "wave_from": 4,
+      "wave_to": 10,
+      "blurb": "La final. La grada es de piedra y el camino cruza el campo entero. Quien llegue a la meta se queda el bosque.",
+      "win": "La copa es del Roble. Los Colmillos vuelven al foso y el camino del bosque queda franco.",
+      "map": {
+        "id": "coliseo",
+        "name": "Coliseo de la Final",
+        "width": 1280,
+        "height": 720,
+        "path_radius": 42,
+        "build_margin": 28,
+        "pitch": "pitch_coliseo",
+        "waypoints": [
+          {"x": -30, "y": 340},
+          {"x": 260, "y": 340},
+          {"x": 260, "y": 170},
+          {"x": 580, "y": 170},
+          {"x": 580, "y": 540},
+          {"x": 920, "y": 540},
+          {"x": 920, "y": 250},
+          {"x": 1180, "y": 250}
+        ],
+        "blocked": [
+          {"x": 0, "y": 260, "w": 70, "h": 170},
+          {"x": 1060, "y": 150, "w": 220, "h": 220}
+        ]
+      }
+    }
+  ]
+}

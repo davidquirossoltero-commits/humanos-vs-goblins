@@ -1,20 +1,20 @@
 # Humanos vs Goblins
 
-Prototipo jugable de defensa de torres. Los humanos protegen la aldea del robledal y los goblins avanzan por un camino hasta la puerta del castillo. El arte es original y está dibujado en código: contornos, colores planos y personajes de caricatura. No usa materiales de otros juegos.
+Prototipo jugable de defensa de torres. Los humanos protegen la aldea del robledal y los goblins avanzan por un camino hasta la meta. El arte es original, de caricatura, y no usa nombres ni material de otros juegos.
 
 Hecho con **Godot 4.7** (GDScript). La interfaz del juego está en español.
 
 ## Qué incluye
 
-- Un mapa con camino sinuoso, pradera construible, cueva de salida y puerta del castillo. No se puede construir sobre el camino, el castillo ni demasiado cerca de otra torre.
+- Tres campos en **La Copa del Robledal**: el prado de la aldea, el foso de los Colmillos y el coliseo de la final. Cada uno tiene su camino. No se puede construir sobre el camino, la meta ni demasiado cerca de otra torre.
 - Tres torres, cada una con dos mejoras:
   - **Arquero**: disparo rápido y flechas perforantes.
   - **Mago**: estallido mayor y escarcha que ralentiza.
   - **Cañón**: metralla y largo alcance.
 - Al colocar una torre se ve el círculo de alcance. Si pulsas una torre ya puesta puedes mejorarla, venderla (70 % del oro invertido) o cambiar el objetivo: Primero, El más fuerte, Último, El más cercano.
 - Cinco enemigos con capas, al estilo de los globos: el ogro pierde la armadura y luego suelta hobgoblins; el hobgoblin suelta goblins; el jinete deja un goblin a pie; el trol entra en furia y al caer suelta un hobgoblin y dos goblins.
-- 10 oleadas, cada una más pesada que la anterior. Oro por baja y por oleada superada. Si un goblin entra en el castillo, pierdes vidas según lo que todavía lleva dentro. Tras la oleada 10 hay victoria. Si las vidas llegan a cero, derrota. Se puede reintentar.
-- Botón de velocidad ×2, sonido generado (se puede silenciar) y controles de ratón, dedo y teclado.
+- El menú abre la crónica, elige capítulo o entra directo al prado. El primer capítulo tiene 10 oleadas, cada una más pesada. Los otros dos usan los tramos más duros de esa lista. Oro por baja y por oleada superada. Si un goblin entra en la meta, pierdes vidas según lo que todavía lleva dentro. Al ganar un capítulo se guarda la marca de superado. Si las vidas llegan a cero, derrota. Se puede reintentar o volver al menú.
+- Botón de velocidad ×2, efectos y una música suave de estadio (órgano, murmullo y un tambor lejano; se silencian con Sonido) y controles de ratón, dedo y teclado.
 - Torres, enemigos, oleadas, mapa y economía viven en JSON (`data/`), para poder añadir más sin reescribir el combate.
 
 ## Requisitos
@@ -42,7 +42,7 @@ El juego se estira para llenar la ventana (en móvil, mejor en horizontal). Rat�
 | Empezar oleada | Sale sola: la primera a los 3 s de pulsar Jugar, y las demás a los 2,5 s de terminar la anterior. Espacio o Empezar ya la adelantan |
 | Acelerar | Botón ×2, o la tecla F |
 | Sonido | Botón Sonido |
-| Jugar / reintentar | El botón del cartel, Espacio o Enter no hace falta: Espacio también reinicia al terminar |
+| Menú | Historia, Niveles y Jugar. Espacio empieza el capítulo. Al terminar, Siguiente capítulo, Reintentar o Menú |
 
 ## Pruebas
 
@@ -127,7 +127,8 @@ En `deploy/nginx.conf` esas dos líneas están comentadas. Quítales el `#` y re
 | `data/towers.json` | Coste, alcance, daño, cadencia y las dos mejoras |
 | `data/enemies.json` | Capas, vida, velocidad, oro, vidas que roba y en qué se rompe |
 | `data/waves.json` | Los grupos de cada oleada |
-| `data/map.json` | Camino, radio del sendero y zonas bloqueadas |
+| `data/map.json` | Camino del prado, radio del sendero y zonas bloqueadas |
+| `data/campaign.json` | Crónica y los tres capítulos (campo, oleadas y texto) |
 | `data/balance.json` | Oro y vidas iniciales, venta, hueco entre torres y bono de oleada |
 
 Los scripts de `scripts/` leen ese JSON. `layers.gd`, `waves.gd`, `economy.gd`, `placement.gd` y `targeting.gd` no dependen de la escena, y por eso se pueden probar en headless.

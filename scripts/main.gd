@@ -8,7 +8,7 @@ func _ready() -> void:
 	mouse_filter = MOUSE_FILTER_IGNORE
 	var bg := ColorRect.new()
 	bg.set_anchors_preset(PRESET_FULL_RECT)
-	bg.color = Color("5aa83c")
+	bg.color = Color("24180f")
 	bg.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(bg)
 	world = GameWorld.new()
@@ -22,6 +22,7 @@ func _ready() -> void:
 	hud.setup(world)
 	ui.add_child(hud)
 	world.changed.connect(hud.refresh)
+	world.changed.connect(_layout)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	hud.refresh()
@@ -29,8 +30,10 @@ func _ready() -> void:
 
 func _layout() -> void:
 	var vp := get_viewport_rect().size
-	var map_scale := minf(vp.x / GameWorld.MAP_SIZE.x, vp.y / GameWorld.MAP_SIZE.y)
-	var origin := (vp - GameWorld.MAP_SIZE * map_scale) * 0.5
+	var top := 0.0 if world.phase == "menu" or world.phase == "won" or world.phase == "lost" else 108.0
+	var avail := Vector2(vp.x, maxf(vp.y - top, 1.0))
+	var map_scale := minf(avail.x / GameWorld.MAP_SIZE.x, avail.y / GameWorld.MAP_SIZE.y)
+	var origin := Vector2((vp.x - GameWorld.MAP_SIZE.x * map_scale) * 0.5, top + (avail.y - GameWorld.MAP_SIZE.y * map_scale) * 0.5)
 	world.apply_layout(origin, map_scale)
 	hud.layout(vp, origin, map_scale)
 
